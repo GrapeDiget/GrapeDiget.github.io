@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>text-shadow와 box-shadow</title>
+    <style>
+        h3 {
+            text-align: center;
+            font: bold 30px sans-serif;
+            color: yellow;
+            text-shadow: 3px 3px 3px blue;
+        }
+        div.box {
+            display: flex;
+            justify-content: center;
+        }
+        div.Pages {
+            width: 150px;
+            margin: 10px;
+            border-width: 2px;
+            border-style: solid;
+            float: left;
+            align-items: center;
+            line-height: 100px;
+        }
+        div.Pages:hover {
+            box-shadow: 0 0 5px blue;
+        }
+        img {
+            width: 150px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <h3>Most Visited Pages</h3>
+    <hr>
+    <div class="box">
+        <div class="Pages"><a href="https://www.naver.com" target="_blank"><img src="image/naver.jpg"></a></div>
+        <div class="Pages"><a href="https://www.google.co.kr" target="_blank"><img src="image/google.png"></a></div>
+        <div class="Pages"><a href="https://daum.net" target="_blank"><img src="image/daumkakao.jpg"></a></div>
+    </div>
+</body>
+</html>
