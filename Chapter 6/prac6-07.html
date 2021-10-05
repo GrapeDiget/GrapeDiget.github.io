@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>큰 자리수와 낮은자리수 같은지 비교</title>
+</head>
+<body>
+    <h3>큰 자리수와 낮은자리수 같은지 비교</h3>
+    <hr>
+    <script>
+        num = prompt("숫자 입력", "");
+        var lsb = num-Math.floor(num/10)*10;
+        var msb = num;
+        var coef = 10;
+        while(Math.floor(num/coef) != 0) {
+            msb = Math.floor(num/coef);
+            coef *= 10;
+        }
+        if(msb == lsb)
+            document.write(num+": 성공");
+        else
+            document.write(num+": 다름");
+    </script>
+</body>
+</html>

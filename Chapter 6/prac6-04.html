@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>월화수목금토일</title>
+</head>
+<body>
+    <h3>월화수목금토일</h3>
+    <hr>
+    <script>
+        var day = prompt("월화수목금토일 중에서 입력하세요", "");
+        if(day == "월" ||day == "목")
+            document.write(day + "은 출근");
+        else if(day == "화" || day == "수")
+            document.write(day + "는 출근");
+        else if(day == "토")
+            document.write(day + "는 휴일");
+        else if(day == "금" || day == "일")
+            document.write(day + "은 휴일");
+        else
+            document.write("잘못된 요일을 입력하셨습니다.");
+    </script>
+</body>
+</html>
