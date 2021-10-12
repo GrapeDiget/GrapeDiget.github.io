@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>book 객체 만들기</title>
+    <script>
+        function Book() {
+            this.title = "HTML5";
+            this.author = "황기태";
+            this.price = 20000;
+        }
+    </script>
+</head>
+<body>
+    <h3>book 객체 만들기</h3>
+    <hr>
+    <script>
+        let a = new Book();
+        document.write("book : ", a.title, ", ", a.author, ", ", a.price, "<br>");
+    </script>
+</body>
+</html>

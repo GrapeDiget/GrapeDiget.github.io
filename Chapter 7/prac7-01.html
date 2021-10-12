@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>난수</title>
+</head>
+<body>
+    <h3>난수 10개 생성</h3>
+    <hr>
+    <script>
+        let n = [];
+        let i;
+        for (i = 0; i < 10; i++) {
+            n[i] = Math.floor(Math.random()*100+1);
+        }
+        for (i = 0; i<10; i++)
+            document.write(n[i]+" ");
+        document.write("<hr>");
+        let big = n[0];
+        for (i = 0; i < 10; i++) {
+            if(big < n[i])
+                big = n[i];
+        }
+        document.write("제일 큰 수는 " + big);
+        document.write("<hr>");
+        n.sort();
+        for (i = 0; i<10; i++)
+            document.write(n[i]+" ");
+    </script>
+</body>
+</html>
