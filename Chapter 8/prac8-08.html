@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스폰지밥</title>
+    <script>
+        let i = 2;
+    </script>
+</head>
+<body>
+    <h3>클릭하면 2,3,4배로 옆으로 늘어납니다.</h3>
+    <hr>
+    <img src="image/spongebob.png" width="300" height="300" alt="스폰지밥" onclick="stretch(this)">
+    <script>
+        function stretch(obj) {
+            obj.style.transform="scale("+i+',1)';
+            i++;
+        }
+    </script>
+</body>
+</html>
