@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계산기 만들기</title>
+    <style>
+        #button > input {
+            width: 70px;
+            margin-left: 10px;
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+    </style>
+    <script>
+        function input(obj) {
+            let exp = document.getElementById("exp");
+            if(exp.value == '0')
+                exp.value = obj.value;
+            else
+                exp.value += obj.value;
+        }
+        function back() {
+            let exp = document.getElementById("exp");
+            if(exp.value.length == 1)
+                exp.value = '0';
+            else
+                exp.value = exp.value.substr(0, exp.value.length-1);
+        }
+        function clearExp() {
+            let exp = document.getElementById("exp");
+            exp.value = eval('0');
+        }
+        function cal() {
+            let exp = document.getElementById("exp");
+            exp.value = eval(exp.value);
+        }
+    </script>
+</head>
+<body>
+    <h3>계산기 만들기</h3>
+    <hr>
+    <form>
+        <input id="exp" type="text" style="width: 370px;" value="0"><br>
+    </form>
+    <form id="button">
+        <input type="button" value="BACK" onclick="back()">
+        <input type="button" value="CE" onclick="clearExp()">
+        <input type="button" value="C" onclick="clearExp()">
+        <input type="button" value="=" onclick="cal()"><br>
+        <input type="button" value="7" onclick="input(this)">
+        <input type="button" value="8" onclick="input(this)">
+        <input type="button" value="9" onclick="input(this)">
+        <input type="button" value="/" onclick="input(this)"><br>
+        <input type="button" value="4" onclick="input(this)">
+        <input type="button" value="5" onclick="input(this)">
+        <input type="button" value="6" onclick="input(this)">
+        <input type="button" value="*" onclick="input(this)"><br>
+        <input type="button" value="1" onclick="input(this)">
+        <input type="button" value="2" onclick="input(this)">
+        <input type="button" value="3" onclick="input(this)">
+        <input type="button" value="-" onclick="input(this)"><br>
+        <input type="button" value="0" onclick="input(this)">
+        <input type="button" value="+" onclick="input(this)">
+        <input type="button" value="NONE">
+        <input type="button" value="NONE"><br>
+    </form>
+    
+</body>
+</html>

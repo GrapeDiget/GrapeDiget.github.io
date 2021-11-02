@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자바스크립트</title>
+    <script>
+        document.ondblclick = function() {
+            let r_random = Math.floor(Math.random()*256);
+            let g_random = Math.floor(Math.random()*256);
+            let b_random = Math.floor(Math.random()*256);
+            document.body.style.backgroundColor = 'rgb('+r_random+','+g_random+','+b_random+')';
+        }
+    </script>
+</head>
+<body>
+    <h3>바탕 아무 곳에나 더블 클릭</h3>
+    <hr>
+    <p>바탕 아무 곳이나 <strong>더블클릭</strong>하면 배경색이 랜덤하게 변합니다.</p>
+</body>
+</html>
