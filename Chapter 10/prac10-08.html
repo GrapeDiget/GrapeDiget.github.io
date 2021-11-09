@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>산수를 풀어 봅시다.</title>
+    <script>
+        let timeover = false
+        function timeLimit() {
+            let time = document.getElementById("time")
+            if (parseInt(time.innerHTML)>0) {
+                time.innerHTML = parseInt(time.innerHTML)-1
+                timeover = false
+            }
+            else {
+                if(!timeover)
+                    calc()
+                    timeover = true
+            }
+        }
+        setInterval("timeLimit()", 1000)
+        function makeQuestion() {
+            question = document.getElementsByClassName('question')
+            answer = document.getElementsByClassName('answer')
+            for(let i = 0; i<question.length; i++) {
+                let randnum = Math.floor(Math.random()*4)
+                let operator = String()
+                if(randnum == 0)
+                    operator = '+'
+                else if(randnum == 1)
+                    operator = '-'
+                else if(randnum == 2)
+                    operator = '*'
+                else
+                    operator = '/'
+                
+                let text = String()
+                text += Math.floor(Math.random()*99+1)
+                text += operator
+                text += Math.floor(Math.random()*99+1)
+                question[i].innerHTML = text
+                question[i].style.textDecoration = "none"
+                answer[i].value = ''
+            }
+        }
+        function calc() {
+            question = document.getElementsByClassName('question')
+            answer = document.getElementsByClassName('answer')
+            let points = 0
+            for(let i = 0; i<question.length; i++) {
+                if(answer[i].value == "")
+                    question[i].style.textDecoration = "line-through"
+                else if(answer[i].value == Math.floor(eval(question[i].innerHTML))) {
+                    points += 1
+                    question[i].style.textDecoration = "none"
+                }
+                else
+                    question[i].style.textDecoration = "line-through"
+            }
+            document.getElementById("score").innerHTML = points
+        }
+        function resetQuestion() {
+            makeQuestion()
+            document.getElementById("time").innerHTML = '10'
+            document.getElementById("score").innerHTML = '0'
+        }
+    </script>
+</head>
+<body onload="makeQuestion()">
+    <h3>산수 문제를 풀어 봅시다.</h3>
+    <p>
+        문제는 자동으로 생성되며, 10초가 지나면 자동 채점됩니다. <br>
+        남은 시간 <span id='time'>10</span>
+    </p>
+    <hr>
+    <form>
+        <table>
+            <tr><td class="question" style="width: 50px;"></td><td><input class="answer" type="text" size="8"></td></tr>
+            <tr><td class="question"></td><td><input class="answer" type="text" size="8"></td></tr>
+            <tr><td class="question"></td><td><input class="answer" type="text" size="8"></td></tr>
+            <tr><td class="question"></td><td><input class="answer" type="text" size="8"></td></tr>
+            <tr><td><button type="button" onclick="resetQuestion()">다시</button></td><td><span id="score">0</span></td></tr>
+        </table>
+    </form>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML5</title>
+    <script>
+        function detectChome() {
+            if (navigator.userAgent.includes("Chrome") && (navigator.vendor.includes("Google Inc."))) {
+                alert("구글 Chrome 브라우저입니다.")
+            }
+            else
+                alert("구글 Chrome 브라우저가 아닙니다.")
+        }
+    </script>
+</head>
+<body onload="detectChome()">
+    <h3>구글 Chrome 브라우저 감별</h3>
+    <hr>
+    <p>
+        웹 브라우저에 따라 지원되는 자바스크립트들이 다를 수도 있습니다.
+        DOM의 기능은 표준화되어 있어 동일하지만, BOM 객체들은 많이 다릅니다.
+        얼른 모두 표준화되었으면 하지만 독창적인 기능으로 승부하고자 하여 쉽지는 않을 것 같습니다.
+    </p>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>setInterval, clearInterval</title>
+    <style>
+        #clock {
+            background-color: rgb(204, 255, 255);
+            border: 1px solid;
+            width: 120px;
+        }
+    </style>
+    <script>
+        function getTime() {
+            let clock = document.getElementById('clock')
+            clock.innerHTML = new Date().toLocaleTimeString()
+        }
+        let timerID = setInterval("getTime()", 1000)
+        let clicked = true
+        function change() {
+            if(clicked) {
+                clearInterval(timerID)
+                document.getElementById('clock').style.color = 'gray'
+                clicked = false
+            }
+            else {
+                timerID = setInterval("getTime()", 1000)
+                document.getElementById('clock').style.color = "black"
+                clicked = true
+            }
+        }
+    </script>
+</head>
+<body>
+    <h3>div 태그에 시계 만들기</h3>
+    <p>시계를 클릭하면 시계가 멈추고 다시 클릭하면 가기 시작한다.</p>
+    <hr>
+    <div id="clock" onclick="change()">&nbsp;</div>
+</body>
+</html>
