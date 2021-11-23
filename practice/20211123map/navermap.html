@@ -145,6 +145,10 @@
             var feature = e.feature;
 
             if (feature.getProperty('focus') !== true) {
+                for(i = 0; i<map.data._features.length; i++) {
+                    map.data._features[i].setProperty('focus', false);
+                }
+                map.data.revertStyle();
                 loadTable(feature.getProperty('area1'));
                 feature.setProperty('focus', true);
             } else {
