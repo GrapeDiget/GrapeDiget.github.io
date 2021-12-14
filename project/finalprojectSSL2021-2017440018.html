@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>재난문자 발령 현황</title>
+    <style>
+        body {
+            width: 100%;
+            height: 100vh;
+            margin: 0px;
+        }
+        #title {
+            border: 1px solid black;
+            background-color: white;
+            display: inline-block;
+            position: fixed;
+            left: 50%;
+            top: 5%;
+            transform: translate(-50%, 0%);
+            z-index: 1;
+        }
+        #loading {
+            border: 1px solid black;
+            background-color: white;
+            display: inline-block;
+            position: fixed;
+            left: 50%;
+            top: 10%;
+            transform: translate(-50%, 0%);
+            z-index: 1;
+        }
+        #search {
+            display: inline-block;
+            position: fixed;
+            left: 3%;
+            top: 15%;
+            width: max-content;
+            z-index: 1;
+        }
+        .info {
+            border: 1px solid black;
+            background-color: white;
+            display: inline-block;
+            width: 9em;
+            text-align: center;
+        }
+        #submit {
+            display: inline-block;
+            margin-left: 45%;
+        }
+        #table {
+            background-color: white;
+            display: none;
+            position: fixed;
+            width: 75%;
+            height: fit-content;
+            max-height: 70%;
+            left: 50%;
+            top: 50%;
+            overflow: scroll;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+        table{
+            text-align: center;
+            background-color: white;
+            width: 100%;
+            height: 100%;
+            border-bottom: 2px solid black;
+            border-collapse: collapse;
+        }
+        table > caption {
+            background-color: #9cd476;
+            border-top: 2px solid black;
+            border-bottom: 2px solid black;
+            font-size: larger;
+            font-weight: bold;
+        }
+        .bgColors:nth-child(even) {
+            background-color: #e7e7e7;
+        }
+        th, td {
+            border-collapse: collapse;
+            padding: 5px;
+        }
+        td.date {
+            width: 16.75%
+        }
+        td.location_name {
+            width: 25.43%
+        }
+        td.msg {
+            width: 45.62%
+        }
+        td.send {
+            width: 12.20%
+        }
+        #close {
+            display: none;
+            position: fixed;
+            left: 50%;
+            bottom: 10%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+        }
+        .circle {
+            border: 1px solid black;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgb(255,255,255);
+            display: table-cell;
+            text-align: center;
+            vertical-align: middle;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+    </style>
+    <!-- naver map -->
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=7d7py3r4ly"></script>
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- 시군구 중심좌표 Json -->
+    <script type="text/javascript" src="https://grapediget.github.io/project/database/center_sigungu.json"></script>
+    <script>
+        var raw_Massage;
+        var massage = [];
+        var globalName = ['강원도', '경기도', '경상남도', '경상북도', '광주광역시', '대구광역시', '대전광역시', '부산광역시', '서울특별시', '울산광역시', '인천광역시', '전라남도', '전라북도', '제주특별자치도', '충청남도', '충청북도', '세종특별자치시'];
+        var localName = [];
+        var regionCode;
+        
+        function getRegionCode() {
+            var xhr = new XMLHttpRequest();
+            var url = 'http://api.odcloud.kr/api/15066113/v1/uddi:b72a7ab6-9c27-44ad-937e-93188c67c53d'; /*URL*/
+            var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'wXG%2FXtYUrxKSkNDwa0yojj4kt6qQeqxElf8MLbn1SJz1QFS5jexLxeDY%2B%2FqycFa6ROuboaa%2FC91NCvmQBMK%2Fxw%3D%3D'; /*Service Key*/
+            queryParams += '&' + encodeURIComponent('page') + '=' + encodeURIComponent('1'); /**/
+            queryParams += '&' + encodeURIComponent('perPage') + '=' + encodeURIComponent(300); /**/
+            queryParams += '&' + encodeURIComponent('returnType') + '=' + encodeURIComponent('xml'); /**/
+            
+            xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    regionCode = JSON.parse(this.response).data;
+                }
+            };
+            
+            xhr.open('GET', url + queryParams);
+            xhr.send('');
+        }
+
+        function setLoading(state) {
+            loading = document.getElementById("loading");
+            if(state)
+                loading.style.display = "inline-block";
+            else
+                loading.style.display = "none";
+        }
+
+        function loadGlobal(num) {
+            setLoading(true);
+            var xhr = new XMLHttpRequest();
+            var url = 'http://apis.data.go.kr/1741000/DisasterMsg3/getDisasterMsg1List'; /*URL*/
+            var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'wXG%2FXtYUrxKSkNDwa0yojj4kt6qQeqxElf8MLbn1SJz1QFS5jexLxeDY%2B%2FqycFa6ROuboaa%2FC91NCvmQBMK%2Fxw%3D%3D'; /*Service Key*/
+            queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+            queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent(num); /**/
+            queryParams += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('xml'); /**/
+
+            xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    raw_Massage = this.responseXML.getElementsByTagName("row");
+                    setLoading(false);
+                    makeGlobalMarker();
+                    setGlobalNumber();
+                    markerEvent(true);
+                }
+            };
+
+            xhr.open('GET', url + queryParams);
+            xhr.send('');
+        }
+
+        function makeGlobalMarker() {
+            for (var i = 0; i < regionGeoJson.length; i++) {
+                region = regionGeoJson[i].features[0];
+                
+                position = findCenter(region.properties.area1, NaN)
+                var marker = new naver.maps.Marker({
+                    position: new naver.maps.LatLng(position[1], position[0]),
+                    map: map,
+                    title: region.properties.area1,
+                    icon: {
+                        content: [
+                                    '<div class="circle" id=',region.properties.area1,'>',
+                                    '</div>'
+                                ].join('')
+                    }
+                });
+                markerList[i] = marker;
+            }
+        }
+
+        function setGlobalNumber() {
+            var globalNumber = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+            massage = []
+            for(var j = 0; j < globalName.length; j++) {
+                massage.push([])
+            }
+
+            for(var i=0; i < raw_Massage.length; i++) {
+                var location = raw_Massage[i].getElementsByTagName("location_name")[0].innerHTML;
+                for(var j = 0; j < globalName.length; j++) {
+                    if(location.includes(globalName[j])){
+                        globalNumber[j] += 1;
+                        massage[j].push(raw_Massage[i])
+                    }
+                }
+            }
+            for(var i = 0; i < globalName.length; i++) {
+                document.getElementById(globalName[i]).innerHTML = globalNumber[i]
+                if (globalNumber[i] < 50) {
+                    red_blue = 255-globalNumber[i]/50*255
+                    green = 255-globalNumber[i]/50*128
+                }
+                else {
+                    red_blue = 0
+                    green = 128
+                }
+                document.getElementById(globalName[i]).style.backgroundColor = 'rgb('+red_blue+','+green+','+red_blue+')';
+            }
+        }
+
+        function loadLocal(location_name, time, num) {
+            setLoading(true)
+            var xhr = new XMLHttpRequest();
+            var url = 'http://apis.data.go.kr/1741000/DisasterMsg4/getDisasterMsg2List'; /*URL*/
+            var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'wXG%2FXtYUrxKSkNDwa0yojj4kt6qQeqxElf8MLbn1SJz1QFS5jexLxeDY%2B%2FqycFa6ROuboaa%2FC91NCvmQBMK%2Fxw%3D%3D'; /*Service Key*/
+            queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+            queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent(num); /**/
+            queryParams += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('xml'); /**/
+            queryParams += '&' + encodeURIComponent('create_date') + '=' + encodeURIComponent(time); /**/
+            queryParams += '&' + encodeURIComponent('location_name') + '=' + encodeURIComponent(location_name); /**/
+            
+            xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    raw_Massage = this.responseXML.getElementsByTagName("row");
+                    setLoading(false);
+                    setLocalName(location_name);
+                    makeLocalMarker(location_name);
+                    setLocalNumber();
+                    markerEvent(false);
+                }
+            };
+            
+            xhr.open('GET', url + queryParams);
+            xhr.send('');
+        }
+        
+        function setLocalName(location_name) {
+            localName = new Array();
+            if(location_name == '세종특별자치시') {
+                localName.push("세종특별자치시")
+                return;
+            }
+            for(var i=0; i < regionCode.length; i++) {
+                if(regionCode[i]["발송지역(시도)"] == location_name) {
+                    if(regionCode[i]["발송지역(시군구)"] != '전체') 
+                        localName.push(regionCode[i]["발송지역(시군구)"]);
+                }
+            }
+        }
+
+        function makeLocalMarker(location_name) {
+            for (var i = 0; i < localName.length; i++) {
+                region = localName[i];
+                
+                idx = globalName.indexOf(location_name)
+                location_code = parseInt(regionGeoJson[idx].features[0].properties.admcode) / 100000000
+                
+                position = findCenter(region, location_code);
+                var marker = new naver.maps.Marker({
+                    position: new naver.maps.LatLng(position[1], position[0]),
+                    map: map,
+                    title: region,
+                    icon: {
+                        content: [
+                                    '<div class="circle" id=', region,'>',
+                                    '</div>'
+                                ].join('')
+                    }
+                });
+                markerList[i] = marker;
+            }
+        }
+
+        function setLocalNumber() {
+            var localNumber = [];
+            massage = [];
+            for(var j = 0; j < localName.length; j++) {
+                localNumber.push(0)
+                massage.push([])
+            }
+            for(var i = 0; i < raw_Massage.length; i++) {
+                var location = raw_Massage[i].getElementsByTagName("location_name")[0].innerHTML;
+                for(var j = 0; j < localName.length; j++) {
+                    if(location.includes(localName[j])){
+                        localNumber[j] += 1;
+                        massage[j].push(raw_Massage[i])
+                    }
+                }
+            }
+            for(var i = 0; i < localName.length; i++) {
+                document.getElementById(localName[i]).innerHTML = localNumber[i];
+                if (localNumber[i] < 50) {
+                    red_blue = 255-localNumber[i]/50*255
+                    green = 255-localNumber[i]/50*128
+                }
+                else {
+                    red_blue = 0
+                    green = 128
+                }
+                document.getElementById(localName[i]).style.backgroundColor = 'rgb('+red_blue+','+green+','+red_blue+')';
+            }
+        }
+
+        function deleteMarker() {
+            for(var i = 0; i < markerList.length; i++) {
+                var target = document.getElementsByClassName('circle')[0];
+                target.parentNode.removeChild(target);
+            }
+            markerList = [];
+        }
+    </script>
+
+</head>
+<body>
+    <div id="title">재난문자 발령 현황</div>
+    <div id="loading">재난문자를 검색중입니다.</div>
+    <form id="search">
+        <div class = "info">검색 지역</div> <select id = 'search_location' style="width:9em; text-align: center" value="">
+            <option value="전국">전국</option>
+            <option value="서울특별시">서울특별시</option>
+            <option value="부산광역시">부산광역시</option>
+            <option value="대구광역시">대구광역시</option>
+            <option value="인천광역시">인천광역시</option>
+            <option value="광주광역시">광주광역시</option>
+            <option value="대전광역시">대전광역시</option>
+            <option value="울산광역시">울산광역시</option>
+            <option value="세종특별자치시">세종특별자치시</option>
+            <option value="경기도">경기도</option>
+            <option value="강원도">강원도</option>
+            <option value="충청북도">충청북도</option>
+            <option value="충청남도">충청남도</option>
+            <option value="전라북도">전라북도</option>
+            <option value="전라남도">전라남도</option>
+            <option value="경상북도">경상북도</option>
+            <option value="경상남도">경상남도</option>
+            <option value="제주특별자치도">제주특별자치도</option>
+        </select>
+            <br>
+        <div class = "info">기준 시간</div> <input id = 'search_time' type="text" style="width:9em; text-align: center" value=""> <br>
+        <div class = "info">검색 데이터 개수</div> <input id = 'search_num' type="text" style="width:9em; text-align: center" value="100"> <br>
+        <div id = 'submit'><button type="button">검색</button></div>
+    </form>
+    <div id="map" style="width: 100%; height: 100%; position: relative; overflow: hidden"></div>
+    <div id="table"></div>
+    <div id="close">
+        <form><button type="button">X</button></form>
+    </div>
+    <script>
+        let center = JSON.parse(JSON.stringify(centerCoordinates));
+
+        let now = new Date();
+        let create_date = now.getFullYear()+'/'+now.getMonth()+'/'+now.getDate()+' '+now.getHours()+':'+now.getMinutes()+':'+now.getSeconds();
+        document.getElementById("search_time").value = create_date;
+
+        document.getElementById("close").addEventListener("click", function() {
+            this.style.display = "none";
+            document.getElementById("table").style.display = "none";
+        })
+
+        document.getElementById("submit").addEventListener("click", function() {
+            search();
+        })
+
+        getRegionCode();
+    </script>
+    <script>
+        var HOME_PATH = "https://navermaps.github.io/maps.js/docs",
+            urlPrefix = HOME_PATH + "/data/region",
+            urlSuffix = ".json",
+            regionGeoJson = [],
+            loadCount = 0,
+            markerList = [];
+
+        var map = new naver.maps.Map(document.getElementById("map"), {
+            zoom: 7,
+            mapTypeId: "normal",
+            center: new naver.maps.LatLng(36.53375, 128.05025),
+        });
+
+        naver.maps.Event.once(map, 'init_stylemap', function () {
+            for (var i = 1; i < 18; i++) {
+                var keyword = i +'';
+
+                if (keyword.length === 1) {
+                    keyword = '0'+ keyword;
+                }
+
+                $.ajax({
+                    url: urlPrefix + keyword + urlSuffix,
+                    success: function(idx) {
+                        return function(geojson) {
+                            regionGeoJson[idx] = geojson;
+                            loadCount++;
+
+                            if (loadCount === 17) {
+                                loadGlobal(100);
+                            }
+                        }
+                    }(i - 1)
+                });
+            }
+        });
+
+        function findCenter(region_name, location_code) {
+            var coordinates = [];
+            if(isFinite(location_code))
+                center.features.forEach(function(reg) {
+                    if (reg.SIG_KOR_NM.includes(region_name)) {
+                        if (parseInt(reg.SIG_CD / 1000) == location_code) {
+                            coordinates.push([reg.X, reg.Y]);
+                        }
+                    }
+                });
+            else
+                center.features.forEach(function(reg) {
+                    if (reg.SIG_KOR_NM.includes(region_name)) {
+                        coordinates.push([reg.X, reg.Y]);
+                    }
+                });
+            if(coordinates.length == 1)
+                return coordinates[0];
+            else {
+                var sum_x = 0,
+                    sum_y = 0;
+                for(var i = 0; i < coordinates.length; i++) {
+                    sum_x += coordinates[i][0];
+                    sum_y += coordinates[i][1];
+                }
+                return [sum_x/coordinates.length, sum_y/coordinates.length]
+            }
+        }
+
+        function markerEvent(region) {
+            markerList.forEach(function(marker) {
+                marker.addListener("click", function(e) {
+                    if(region)
+                        var localMassage = massage[globalName.indexOf(marker.title)];
+                    else
+                        var localMassage = massage[localName.indexOf(marker.title)];
+                    table = document.getElementById("table");
+                    var content = ['<table>',
+                        '<caption>', marker.title, '</caption>',
+                        '<thead class="bgColors">',
+                            '<tr><th>생성일시</th><th>수신지역</th><th>내용</th><th>발신처</th></tr>',
+                        '</thead>',
+                        '<tbody>'];
+                    for (var j = 0; j < localMassage.length; j++) {
+                        let location_name = localMassage[j].getElementsByTagName("location_name")[0].innerHTML;
+                        if(location_name.length > 30) {
+                            location_name = location_name.slice(0, 40) + '...'
+                        }
+                        content.push(['<tr class="bgColors"><td class="date">',
+                            localMassage[j].getElementsByTagName("create_date")[0].innerHTML,
+                            '</td><td class="location_name">',
+                            location_name,
+                            '</td><td class="msg">',
+                            localMassage[j].getElementsByTagName("msg")[0].innerHTML,
+                            '</td><td class="send">',
+                            localMassage[j].getElementsByTagName("send_platform")[0].innerHTML,
+                            '</td></tr>'].join(''))
+                    }
+                    content.push('</tbody></table>');
+                    table.innerHTML = content.join('');
+                    table.style.display = 'inline-block';
+                    document.getElementById("close").style.display = "inline-block";
+                });
+            });
+        }
+
+        function search() {
+            deleteMarker();
+            var location = document.getElementById("search_location").value;
+            var time = document.getElementById("search_time").value;
+            var num = document.getElementById("search_num").value;
+            if(location == "전국") {
+                map.setCenter(new naver.maps.LatLng(36.53375, 128.05025));
+                map.setZoom(7);
+                makeGlobalMarker();
+                loadGlobal(num);
+            }
+
+            var feature = regionGeoJson[globalName.indexOf(location)].features[0];
+            var minPoint = new naver.maps.Point(feature.bbox[0], feature.bbox[1]);
+            var maxPoint = new naver.maps.Point(feature.bbox[2], feature.bbox[3]);
+            var bound = new naver.maps.PointBounds(minPoint, maxPoint);
+            map.panToBounds(bound);
+            loadLocal(location, time, num);
+        }
+    </script>
+</body>
+</html>
